@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    tools:context=".uj.AdminActivity">
+
+    <ProgressBar
+        android:id="@+id/progressBarAdmin"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+    <LinearLayout
+        android:id="@+id/admin_gombok_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ERŐFORRÁS KEZELÉS"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add_sofor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Új sofőr hozzáadása"
+            app:icon="@android:drawable/ic_input_add"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add_auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Új autó hozzáadása"
+            app:icon="@android:drawable/ic_input_add"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:weightSum="2">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_sofor"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sofőr törlése"
+                android:textColor="@android:color/holo_red_dark"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconTint="@android:color/holo_red_dark"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete_auto"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Autó törlése"
+                android:textColor="@android:color/holo_red_dark"
+                app:icon="@android:drawable/ic_menu_delete"
+                app:iconTint="@android:color/holo_red_dark"/>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#DDDDDD"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ADATBÁZIS MŰVELETEK"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_torles_intervallum"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Törlés sorszám alapján"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_teszt_adatok"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="100 Teszt adat generálása"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_osszes_torlese"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="MINDEN ADAT TÖRLÉSE"
+            android:backgroundTint="@android:color/holo_red_dark"/>
+
+    </LinearLayout>
+
+</LinearLayout>

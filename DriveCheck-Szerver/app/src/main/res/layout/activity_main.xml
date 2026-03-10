@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#121212"> <LinearLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:fitsSystemWindows="false"
+    tools:context=".MainActivity">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_logo_container"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        android:layout_gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/auto_logo"
+            android:contentDescription="App Logo"
+            android:scaleType="fitCenter" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:text="Adminisztrációs és Szerver Központ"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_kerelmek"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:text="Kérelmek kezelése"
+        app:icon="@android:drawable/ic_menu_agenda"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_osszesites"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:text="Összesítés és Szűrés"
+        app:icon="@android:drawable/ic_menu_search"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_admin"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:text="Rendszerbeállítások"
+        app:icon="@android:drawable/ic_menu_manage"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_server_toggle"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:text="OFFLINE"
+        android:backgroundTint="#C62828"
+        android:textColor="@android:color/white"
+        app:icon="@android:drawable/ic_lock_power_off"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_server_info"
+        android:layout_width="360dp"
+        android:layout_height="wrap_content"
+        android:text="Szerver állapota: Kikapcsolva"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#BDBDBD"/>
+
+</LinearLayout>
+</ScrollView>
