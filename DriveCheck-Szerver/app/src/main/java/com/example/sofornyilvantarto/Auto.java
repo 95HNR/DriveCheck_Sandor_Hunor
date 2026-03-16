@@ -1,21 +1,35 @@
 package com.example.sofornyilvantarto.uj;
+
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "autok")
 public class Auto {
+
+    @PrimaryKey
+    @NonNull
     private String rendszam;
     private String tipus;
+    private String statusz; // ÚJ MEZŐ: "ELERHETO" vagy "FOGLALT"
 
-    public Auto(String rendszam, String tipus) {
+    public Auto(@NonNull String rendszam, String tipus, String statusz) {
         this.rendszam = rendszam;
         this.tipus = tipus;
+        this.statusz = statusz;
     }
 
-    // Ures konstruktor a Room-nak
-    public Auto() { }
+    // Üres konstruktor a Room-nak
+    public Auto() {
+        this.rendszam = "";
+    }
 
+    @NonNull
     public String getRendszam() {
         return rendszam;
     }
 
-    public void setRendszam(String rendszam) {
+    public void setRendszam(@NonNull String rendszam) {
         this.rendszam = rendszam;
     }
 
@@ -25,6 +39,14 @@ public class Auto {
 
     public void setTipus(String tipus) {
         this.tipus = tipus;
+    }
+
+    public String getStatusz() {
+        return statusz;
+    }
+
+    public void setStatusz(String statusz) {
+        this.statusz = statusz;
     }
 
     @Override

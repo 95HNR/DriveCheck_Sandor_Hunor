@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+// Helyes R import a csomagodhoz
+import com.example.sofornyilvantarto.uj.R;
+
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import java.text.SimpleDateFormat;
@@ -83,13 +87,22 @@ public class UjBejegyzesActivity extends AppCompatActivity {
             double fogyasztas = Double.parseDouble(etFogyasztas.getText().toString());
 
             Sofor sofor = new Sofor(soforNev);
-            Auto auto = new Auto(rendszam, tipus);
-            // Alapértelmezett státusz: BEERKEZO
+
+            // --- JAVÍTÁS: Itt adtuk hozzá a 3. paramétert ("FOGLALT")! ---
+            Auto auto = new Auto(rendszam, tipus, "FOGLALT");
+
+            // Alapértelmezett státusz az útnak: BEERKEZO
             Ut ujUt = new Ut(sofor, auto, indulas, erkezes, tavolsag, koltseg, fogyasztas, honapEv, "BEERKEZO");
 
-            db.utDao().insert(ujUt);
-            Toast.makeText(this, "Kérelem elküldve!", Toast.LENGTH_SHORT).show();
-            finish();
+            // Mentés futtatása egy külön szálon (hogy ne akadjon meg a UI)
+            new Thread(() -> {
+                db.utDao().insert(ujUt);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Kérelem elküldve!", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }).start();
+
         } catch (Exception e) {
             Toast.makeText(this, "Hiba a mentés során!", Toast.LENGTH_SHORT).show();
         }

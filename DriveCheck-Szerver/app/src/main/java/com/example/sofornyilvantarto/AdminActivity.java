@@ -121,7 +121,19 @@ public class AdminActivity extends AppCompatActivity {
         builder.setPositiveButton("Mentés", (dialog, which) -> {
             String tipus = etTipus.getText().toString().trim();
             String rendszam = etRendszam.getText().toString().trim().toUpperCase();
-            if (!tipus.isEmpty() && !rendszam.isEmpty()) mentesSablonkent(null, new Auto(rendszam, tipus));
+
+            // JAVÍTÁS: A 3. paraméter ("ELERHETO") hozzáadása!
+            // Így bekerül az új autok táblába is, és a sablonok közé is.
+            if (!tipus.isEmpty() && !rendszam.isEmpty()) {
+                Auto ujAuto = new Auto(rendszam, tipus, "ELERHETO");
+
+                databaseExecutor.execute(() -> {
+                    // Mentsük el a dedikált autók táblájába is, hogy látszódjon az autók listájában!
+                    db.autoDao().insert(ujAuto);
+                });
+
+                mentesSablonkent(null, ujAuto);
+            }
         });
         builder.setNegativeButton("Mégse", null);
         builder.show();
@@ -247,24 +259,27 @@ public class AdminActivity extends AppCompatActivity {
             for (int i = 0; i < 100; i++) {
                 String rNap = String.format(Locale.US, "%02d", random.nextInt(28) + 1);
                 String datum = "2026-03-" + rNap;
+
+                // JAVÍTÁS: Itt is bekerült az "ELERHETO" a 3. paraméter helyére!
                 db.utDao().insert(new Ut(new Sofor(n[random.nextInt(n.length)]),
-                        new Auto("ABC-"+(100+i), t[random.nextInt(t.length)]),
+                        new Auto("ABC-"+(100+i), t[random.nextInt(t.length)], "ELERHETO"),
                         "Hely A", "Hely B", 10.0 + random.nextInt(50), 5.0, 6.5, datum, "BEERKEZO"));
             }
             runOnUiThread(() -> { showProgress(false); Toast.makeText(this, "100 adat kész.", Toast.LENGTH_SHORT).show(); });
         });
     }
 
-    // JAVÍTÁS: Adatbázis reset és ID nullázás
     private void osszesBejegyzesTorlese() {
         new AlertDialog.Builder(this).setTitle("MINDEN TÖRLÉSE").setMessage("Biztosan törölsz mindent? A sorszámozás is 1-ről fog indulni!")
                 .setPositiveButton("Igen", (d, w) -> {
                     showProgress(true);
                     databaseExecutor.execute(() -> {
-                        // 1. Tábla ürítése
                         db.utDao().deleteAll();
-                        // 2. Számláló nullázása
                         db.utDao().resetSequence();
+
+                        // Opcionális: Ha az autókat is törölni akarod a teljes resetnél, ez a sor megteszi:
+                        // db.autoDao().deleteAll();
+
                         runOnUiThread(() -> {
                             showProgress(false);
                             Toast.makeText(this, "Adatbázis ürítve, sorszámozás resetelve.", Toast.LENGTH_SHORT).show();

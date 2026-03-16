@@ -1,4 +1,4 @@
-package com.example.sofornyilvantarto.uj; // VISSZAÁLLÍTVA A .uj VÉGZŐDÉS
+package com.example.sofornyilvantarto.uj;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-// A hiba javítása: Az R osztály importálása a .uj csomagból
 import com.example.sofornyilvantarto.uj.R;
 
 import com.google.android.material.button.MaterialButton;
@@ -40,9 +39,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main); // Itt már a .uj.R-t használja
+        setContentView(R.layout.activity_main);
 
-        // Navigációs gombok - a .uj csomagon belüli Activity-kre hivatkozva
         findViewById(R.id.btn_kerelmek).setOnClickListener(v ->
                 startActivity(new Intent(this, KerelmekActivity.class)));
         findViewById(R.id.btn_osszesites).setOnClickListener(v ->
@@ -84,12 +82,22 @@ public class MainActivity extends AppCompatActivity {
 
             String message = reader.readLine();
             if (message != null) {
-                // Szabványos lekérdezések kezelése
-                if (message.equals("GET_ALL")) {
+
+                // 1. ADATBÁZISBÓL OLVASÁS A FIX LISTÁK HELYETT!
+                if (message.equals("GET_AUTOK_ELERHETO")) {
+                    List<Auto> elerhetoAutok = db.autoDao().getAutokByStatus("ELERHETO");
+                    writer.println(gson.toJson(elerhetoAutok));
+                }
+                else if (message.equals("GET_AUTOK_FOGLALT")) {
+                    List<Auto> foglaltAutok = db.autoDao().getAutokByStatus("FOGLALT");
+                    writer.println(gson.toJson(foglaltAutok));
+                }
+
+                // 2. Régi lekérdezések (utak kezelése)
+                else if (message.equals("GET_ALL")) {
                     List<Ut> utak = db.utDao().getAllSync();
                     writer.println(gson.toJson(utak));
                 }
-                // Kliens erőforrás igényének kiszolgálása (nevek, autók)
                 else if (message.equals("GET_RESOURCES")) {
                     List<Ut> osszesUt = db.utDao().getAllSync();
                     writer.println(gson.toJson(osszesUt));
@@ -107,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try { clientSocket.close(); } catch (IOException ignored) {}

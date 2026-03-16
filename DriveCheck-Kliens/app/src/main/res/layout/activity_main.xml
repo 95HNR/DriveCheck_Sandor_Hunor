@@ -58,7 +58,7 @@
             android:id="@+id/btn_elerheto_autok"
             android:layout_width="360dp"
             android:layout_height="60dp"
-            android:text="Elérhető autók listázása"
+            android:text="Autók listázása"
             app:icon="@android:drawable/ic_menu_search"
             android:layout_marginBottom="20dp"/>
 

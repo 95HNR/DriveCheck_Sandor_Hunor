@@ -146,15 +146,15 @@ public class ListazasActivity extends AppCompatActivity {
 
                     new Handler(Looper.getMainLooper()).post(() -> {
                         // DIAGNOSZTIKA: Megmondja, hány adat jött a szerverről
-                        Toast.makeText(this, "Adatok: " + szurtLista.size(), Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(this, "Adatok: " + szurtLista.size(), Toast.LENGTH_SHORT).show();
                         adapter.setUtak(szurtLista);
                         adapter.notifyDataSetChanged();
                     });
                 } else {
-                    runOnUiThread(() -> Toast.makeText(this, "A szerver nem küldött adatot!", Toast.LENGTH_SHORT).show());
+                    //runOnUiThread(() -> Toast.makeText(this, "A szerver nem küldött adatot!", Toast.LENGTH_SHORT).show());
                 }
             } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(this, "Szerver hiba: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                //runOnUiThread(() -> Toast.makeText(this, "Szerver hiba: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         });
     }
