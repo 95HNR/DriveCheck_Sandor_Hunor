@@ -1,7 +1,9 @@
 # Android Project
 ## Student Information
 Name: Sándor Hunor
+
 Student ID: 95
+
 Course: Android Development
 
 ## Project Title
