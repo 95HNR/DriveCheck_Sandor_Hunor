@@ -13,23 +13,37 @@ Project Overview: DriveCheck System
 The DriveCheck suite is a professional fleet management and trip logging system consisting of two interconnected Android applications: a Server for administrative control and data persistence, and a Client for driver interactions.
 
 1. DriveCheck Server (Administrator App)
+   
 -The Server application acts as the central hub for the entire system, managing the database and handling remote requests.
+
 *Database Management: Utilizes a Room database to store trip logs (Uts), drivers (Sofors), and the company vehicle fleet (Autos).
+
 *Socket Server: Runs a background service on port 8080 to listen for incoming Client connections and process data synchronized via JSON.
+
 *Request Handling: Features a dedicated interface to review, approve, or manage incoming trip requests from drivers.
+
 *Admin Tools: Provides advanced operations such as database resets, test data generation, and manual management of the vehicle fleet.
 
 2. DriveCheck Client (Driver App)
+
 -The Client application is designed for drivers to easily submit reports and check vehicle availability in real-time.
+
 *Trip Reporting: Drivers can submit detailed trip logs including distance, fuel consumption, and cost directly to the server.
+
 *Fleet Status: A tabbed interface allows drivers to browse the current status of the fleet, separated into "Available" and "Occupied" vehicles.
+
 *Connection Monitoring: Includes a real-time status checker that monitors the server's availability based on its IP address.
+
 *Auto-Suggest Integration: Features location auto-suggestion using OpenStreetMap (OSM) to simplify address entry.
 
 Technical Stack:
+
 Language: Java
+
 Communication: Raw TCP Sockets with JSON serialization (Gson)
+
 Persistence: Room Persistence Library (SQLite)
+
 UI Components: Material Design, ViewPager2, and TabLayout
 
 ## Features
