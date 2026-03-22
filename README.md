@@ -67,8 +67,6 @@ UI Components: Material Design, ViewPager2, and TabLayout
 <img width="448" height="940" alt="image" src="https://github.com/user-attachments/assets/16f940db-9f3a-40a9-957d-e7891bd48b2c" />
 <img width="448" height="940" alt="image" src="https://github.com/user-attachments/assets/573f0d4d-4fbc-4da9-9ff3-ead56f5a8eff" />
 
-<img width="437" height="945" alt="image" src="https://github.com/user-attachments/assets/3c5b99da-2187-4539-b37b-6a86a126cb35" />
-
 ## Technologies Used
 - **Language**: Java (Primary development language).
 - **Database**: **Room Persistence Library** (SQLite abstraction) for local data storage.
