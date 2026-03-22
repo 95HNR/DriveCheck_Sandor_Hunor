@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="360dp"
             android:layout_height="wrap_content"
-            android:text="Nyújts be kérelmet a főnöknek."
+            android:text="Nyújts be kérelmet a főnöknek"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textAlignment="center"
