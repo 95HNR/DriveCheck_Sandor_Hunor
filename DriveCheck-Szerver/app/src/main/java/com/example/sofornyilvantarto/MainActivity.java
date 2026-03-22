@@ -9,10 +9,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.sofornyilvantarto.uj.R;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +20,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Felső sáv elrejtése a Főoldalon, mert itt saját dizájn van logóval
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
         findViewById(R.id.btn_kerelmek).setOnClickListener(v ->
                 startActivity(new Intent(this, KerelmekActivity.class)));
         findViewById(R.id.btn_osszesites).setOnClickListener(v ->
@@ -55,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
             if (!isServerRunning) startServer();
             else stopServer();
         });
+
+        // Alapértelmezett állapot beállítása indításkor
+        updateServerUI(false, "Szerver: Kikapcsolva");
     }
 
     private void startServer() {
@@ -83,17 +96,42 @@ public class MainActivity extends AppCompatActivity {
             String message = reader.readLine();
             if (message != null) {
 
-                // 1. ADATBÁZISBÓL OLVASÁS A FIX LISTÁK HELYETT!
-                if (message.equals("GET_AUTOK_ELERHETO")) {
-                    List<Auto> elerhetoAutok = db.autoDao().getAutokByStatus("ELERHETO");
-                    writer.println(gson.toJson(elerhetoAutok));
-                }
-                else if (message.equals("GET_AUTOK_FOGLALT")) {
-                    List<Auto> foglaltAutok = db.autoDao().getAutokByStatus("FOGLALT");
-                    writer.println(gson.toJson(foglaltAutok));
-                }
+                if (message.startsWith("GET_AUTOK_")) {
+                    List<Auto> osszesAuto = db.autoDao().getAllAutok();
+                    List<Ut> jovahagyottUtak = db.utDao().getUtakByStatus("JOVAHAGYOTT");
 
-                // 2. Régi lekérdezések (utak kezelése)
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    String maiDatum = sdf.format(new Date());
+
+                    Map<String, String> maiFoglaltRendszamok = new HashMap<>();
+                    for (Ut ut : jovahagyottUtak) {
+                        if (ut.getAuto() != null) {
+                            String utDatum = ut.getHonapEv();
+                            if (utDatum != null && utDatum.equals(maiDatum)) {
+                                maiFoglaltRendszamok.put(ut.getAuto().getRendszam(), utDatum);
+                            }
+                        }
+                    }
+
+                    List<Auto> valaszLista = new ArrayList<>();
+
+                    if (message.equals("GET_AUTOK_ELERHETO")) {
+                        for (Auto a : osszesAuto) {
+                            if (!maiFoglaltRendszamok.containsKey(a.getRendszam())) {
+                                valaszLista.add(a);
+                            }
+                        }
+                    }
+                    else if (message.equals("GET_AUTOK_FOGLALT")) {
+                        for (Auto a : osszesAuto) {
+                            if (maiFoglaltRendszamok.containsKey(a.getRendszam())) {
+                                Auto foglaltAuto = new Auto(a.getRendszam(), a.getTipus() + "\n(Ma foglalt: " + maiDatum + ")", "FOGLALT");
+                                valaszLista.add(foglaltAuto);
+                            }
+                        }
+                    }
+                    writer.println(gson.toJson(valaszLista));
+                }
                 else if (message.equals("GET_ALL")) {
                     List<Ut> utak = db.utDao().getAllSync();
                     writer.println(gson.toJson(utak));
@@ -111,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(() -> Toast.makeText(this, "Új kérelem: " + ut.getSofor().getNev(), Toast.LENGTH_SHORT).show());
                         }
                     } catch (Exception e) {
-                        // Nem megfelelő JSON esetén csendben maradunk
+                        // Csendes kivételkezelés
                     }
                 }
             }
@@ -139,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateServerUI(boolean online, String info) {
         runOnUiThread(() -> {
             btnServerToggle.setText(online ? "ONLINE" : "OFFLINE");
-            btnServerToggle.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(online ? "#2E7D32" : "#C62828")));
+            btnServerToggle.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(online ? "#2E7D32" : "#B3261E")));
             tvServerInfo.setText(info);
         });
     }

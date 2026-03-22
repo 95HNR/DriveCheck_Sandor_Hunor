@@ -56,7 +56,7 @@ public class ListazasActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setTitle("Összesítés");
+            getSupportActionBar().setTitle("Benyújtott kérelmek");
         }
 
         // Nézetek bekötése
