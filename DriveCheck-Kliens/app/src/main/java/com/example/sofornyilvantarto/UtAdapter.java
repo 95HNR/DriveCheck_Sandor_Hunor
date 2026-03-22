@@ -6,20 +6,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UtAdapter extends RecyclerView.Adapter<UtAdapter.UtViewHolder> {
 
     private List<Ut> utak = new ArrayList<>();
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Ut ut);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public void setUtak(List<Ut> ujUtak) {
         this.utak = new ArrayList<>();
         if (ujUtak != null) {
             for (Ut ut : ujUtak) {
-                // Csak a valódi utakat adjuk hozzá, a "SABLON"-okat nem
+                // Csak a nem sablon bejegyzéseket jelenítjük meg
                 if (ut != null && !"SABLON".equals(ut.getStatus())) {
                     this.utak.add(ut);
                 }
@@ -37,61 +46,53 @@ public class UtAdapter extends RecyclerView.Adapter<UtAdapter.UtViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull UtViewHolder holder, int position) {
-        try {
-            Ut ut = utak.get(position);
-            if (ut == null) return;
+        Ut ut = utak.get(position);
+        if (ut == null) return;
 
-            // 1. Dátum és ID megjelenítése
-            String datum = (ut.getHonapEv() != null) ? ut.getHonapEv() : "Nincs dátum";
-            holder.tvIdDatum.setText("#" + ut.getId() + " - " + datum);
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(ut);
+        });
 
-            // 2. Sofőr és Autó (Null-safe kezelés)
-            String soforNev = "Ismeretlen";
-            if (ut.getSofor() != null && ut.getSofor().getNev() != null) {
-                soforNev = ut.getSofor().getNev();
-            }
+        // 1. ID és Dátum
+        String datum = (ut.getHonapEv() != null) ? ut.getHonapEv() : "-";
+        holder.tvIdDatum.setText("#" + ut.getId() + " - " + datum);
 
-            String autoInfo = "Ismeretlen autó";
-            if (ut.getAuto() != null) {
-                String rendszam = (ut.getAuto().getRendszam() != null) ? ut.getAuto().getRendszam() : "???";
-                String tipus = (ut.getAuto().getTipus() != null) ? ut.getAuto().getTipus() : "Ismeretlen típus";
-                autoInfo = rendszam + " (" + tipus + ")";
-            }
-            holder.tvSoforAuto.setText("Sofőr: " + soforNev + " | Autó: " + autoInfo);
+        // 2. Sofőr és Autó (Típussal kiegészítve)
+        String soforNev = (ut.getSofor() != null) ? ut.getSofor().getNev() : "Ismeretlen";
+        String autoInfo = "Nincs autó";
+        if (ut.getAuto() != null) {
+            String tipus = ut.getAuto().getTipus() != null ? ut.getAuto().getTipus() : "Ismeretlen típus";
+            String rendszam = ut.getAuto().getRendszam() != null ? ut.getAuto().getRendszam() : "???";
+            autoInfo = tipus + " (" + rendszam + ")";
+        }
+        holder.tvSoforAuto.setText("Sofőr: " + soforNev + " | Autó: " + autoInfo);
 
-            // 3. Útvonal
-            String indulas = (ut.getIndulas() != null) ? ut.getIndulas() : "-";
-            String erkezes = (ut.getErkezes() != null) ? ut.getErkezes() : "-";
-            holder.tvUtvonal.setText("Útvonal: " + indulas + " -> " + erkezes);
+        // 3. Útvonal és Távolság
+        holder.tvUtvonalTav.setText("Úticél: " + ut.getIndulas() + " -> " + ut.getErkezes() + " | Táv: " + ut.getTavolsag() + " km");
 
-            // 4. Statisztika
-            holder.tvAdatok.setText("Táv: " + ut.getTavolsag() + " km | Költség: " + ut.getKoltseg() + " EUR | Üzemanyag: " + ut.getFogyasztas() + " L");
+        // 4. Fogyasztás és Átlag
+        double atlag = (ut.getTavolsag() > 0) ? (ut.getFogyasztas() / ut.getTavolsag()) * 100 : 0;
+        holder.tvFogyasztasAtlag.setText(String.format(Locale.US, "Fogyasztás: %.1f L | Átlag: %.2f L/100km",
+                ut.getFogyasztas(), atlag));
 
-            // 5. Állapot és Színezés (Biztonságos CardView kezelés)
-            String status = (ut.getStatus() != null) ? ut.getStatus() : "BEERKEZO";
+        // 5. Költség
+        holder.tvKoltseg.setText("Költség: " + ut.getKoltseg() + " EUR");
 
-            if (holder.cardView != null) {
-                switch (status) {
-                    case "JOVAHAGYOTT":
-                        holder.cardView.setCardBackgroundColor(Color.parseColor("#E8F5E9"));
-                        holder.tvStatus.setText("ÁLLAPOT: JÓVÁHAGYVA");
-                        holder.tvStatus.setTextColor(Color.parseColor("#2E7D32"));
-                        break;
-                    case "ELUTASITOTT":
-                        holder.cardView.setCardBackgroundColor(Color.parseColor("#FFEBEE"));
-                        holder.tvStatus.setText("ÁLLAPOT: ELUTASÍTVA");
-                        holder.tvStatus.setTextColor(Color.parseColor("#C62828"));
-                        break;
-                    default:
-                        holder.cardView.setCardBackgroundColor(Color.WHITE);
-                        holder.tvStatus.setText("ÁLLAPOT: BEÉRKEZETT");
-                        holder.tvStatus.setTextColor(Color.DKGRAY);
-                        break;
-                }
-            }
-        } catch (Exception e) {
-            // Ha bármi hiba történne egy elem kirajzolásakor, az app nem áll le
-            e.printStackTrace();
+        // Státusz beállítása és színezése
+        String status = (ut.getStatus() != null) ? ut.getStatus() : "BEERKEZO";
+        switch (status) {
+            case "JOVAHAGYOTT":
+                holder.tvStatus.setText("JÓVÁHAGYVA");
+                holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Zöld
+                break;
+            case "ELUTASITOTT":
+                holder.tvStatus.setText("ELUTASÍTVA");
+                holder.tvStatus.setTextColor(Color.parseColor("#E53935")); // Piros
+                break;
+            default:
+                holder.tvStatus.setText("ELBÍRÁLÁS ALATT");
+                holder.tvStatus.setTextColor(holder.defaultStatusColor); // Téma szerinti alapértelmezett
+                break;
         }
     }
 
@@ -101,21 +102,20 @@ public class UtAdapter extends RecyclerView.Adapter<UtAdapter.UtViewHolder> {
     }
 
     static class UtViewHolder extends RecyclerView.ViewHolder {
-        TextView tvIdDatum, tvSoforAuto, tvUtvonal, tvAdatok, tvStatus;
-        CardView cardView; // Általános CardView-ra cserélve a stabilitásért
+        TextView tvIdDatum, tvStatus, tvSoforAuto, tvUtvonalTav, tvFogyasztasAtlag, tvKoltseg;
+        int defaultStatusColor;
 
         public UtViewHolder(@NonNull View itemView) {
             super(itemView);
             tvIdDatum = itemView.findViewById(R.id.tv_item_id_datum);
-            tvSoforAuto = itemView.findViewById(R.id.tv_item_sofor_auto);
-            tvUtvonal = itemView.findViewById(R.id.tv_item_utvonal);
-            tvAdatok = itemView.findViewById(R.id.tv_item_tav_koltseg);
             tvStatus = itemView.findViewById(R.id.tv_item_status);
+            tvSoforAuto = itemView.findViewById(R.id.tv_item_sofor_auto);
+            tvUtvonalTav = itemView.findViewById(R.id.tv_item_utvonal_tav);
+            tvFogyasztasAtlag = itemView.findViewById(R.id.tv_item_fogyasztas_atlag);
+            tvKoltseg = itemView.findViewById(R.id.tv_item_koltseg);
 
-            // Biztonságos bekötés: ha az XML-ben nem MaterialCardView van, akkor is működik
-            if (itemView instanceof CardView) {
-                cardView = (CardView) itemView;
-            }
+            // Eredeti szövegszín mentése
+            defaultStatusColor = tvStatus.getTextColors().getDefaultColor();
         }
     }
 }

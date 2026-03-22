@@ -42,7 +42,7 @@ public class KerelmekActivity extends AppCompatActivity {
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
-                case 0: tab.setText("Beérkező"); break;
+                case 0: tab.setText("Elbírálandó"); break;
                 case 1: tab.setText("Jóváhagyott"); break;
                 case 2: tab.setText("Elutasított"); break;
             }

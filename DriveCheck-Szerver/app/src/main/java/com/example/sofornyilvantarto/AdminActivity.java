@@ -13,9 +13,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-// Erőforrás import a helyes csomagból
-import com.example.sofornyilvantarto.uj.R;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -122,13 +119,10 @@ public class AdminActivity extends AppCompatActivity {
             String tipus = etTipus.getText().toString().trim();
             String rendszam = etRendszam.getText().toString().trim().toUpperCase();
 
-            // JAVÍTÁS: A 3. paraméter ("ELERHETO") hozzáadása!
-            // Így bekerül az új autok táblába is, és a sablonok közé is.
             if (!tipus.isEmpty() && !rendszam.isEmpty()) {
                 Auto ujAuto = new Auto(rendszam, tipus, "ELERHETO");
 
                 databaseExecutor.execute(() -> {
-                    // Mentsük el a dedikált autók táblájába is, hogy látszódjon az autók listájában!
                     db.autoDao().insert(ujAuto);
                 });
 
@@ -139,61 +133,143 @@ public class AdminActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // --- CSAK SOFŐRÖK TÖRLÉSE ---
+    // ==============================================================
+    // ÚJ: TÖBBES KIJELÖLÉSŰ SOFŐR ÉS AUTÓ TÖRLÉS + OK/MÉGSE GOMBOK
+    // ==============================================================
+
+    // --- SOFŐRÖK TÖRLÉSE (CHECKBOXOS) ---
     private void showOnlySoforDeleteDialog() {
         databaseExecutor.execute(() -> {
             List<Ut> osszesUt = db.utDao().getAllUtak();
             Set<String> soforok = new HashSet<>();
             for (Ut u : osszesUt) {
-                if (u.getSofor() != null) soforok.add(u.getSofor().getNev());
+                if (u.getSofor() != null && u.getSofor().getNev() != null) {
+                    soforok.add(u.getSofor().getNev());
+                }
             }
             final List<String> lista = new ArrayList<>(soforok);
+
             runOnUiThread(() -> {
-                if (lista.isEmpty()) { Toast.makeText(this, "Nincs sofőr!", Toast.LENGTH_SHORT).show(); return; }
+                if (lista.isEmpty()) { Toast.makeText(this, "Nincs törölhető sofőr!", Toast.LENGTH_SHORT).show(); return; }
+
+                String[] soforArray = lista.toArray(new String[0]);
+                boolean[] checkedItems = new boolean[soforArray.length];
+
                 new AlertDialog.Builder(this)
-                        .setTitle("Válaszd ki a törlendő sofőrt")
-                        .setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, lista), (dialog, which) -> {
-                            executeTargetedDelete(lista.get(which), true);
-                        }).show();
+                        .setTitle("Válaszd ki a törlendő sofőröket")
+                        .setMultiChoiceItems(soforArray, checkedItems, (dialog, which, isChecked) -> {
+                            checkedItems[which] = isChecked;
+                        })
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            List<String> kivalasztottak = new ArrayList<>();
+                            for (int i = 0; i < checkedItems.length; i++) {
+                                if (checkedItems[i]) kivalasztottak.add(soforArray[i]);
+                            }
+
+                            if (!kivalasztottak.isEmpty()) {
+                                executeTargetedMultipleDelete(kivalasztottak, true);
+                            } else {
+                                Toast.makeText(this, "Nem választottál ki semmit!", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("Mégse", null)
+                        .show();
             });
         });
     }
 
-    // --- CSAK AUTÓK TÖRLÉSE ---
+    // --- AUTÓK TÖRLÉSE (CHECKBOXOS) ---
     private void showOnlyAutoDeleteDialog() {
         databaseExecutor.execute(() -> {
-            List<Ut> osszesUt = db.utDao().getAllUtak();
             Set<String> autok = new HashSet<>();
+
+            // Lekérjük a már létező utazásokból/sablonokból az autókat
+            List<Ut> osszesUt = db.utDao().getAllUtak();
             for (Ut u : osszesUt) {
-                if (u.getAuto() != null) autok.add(u.getAuto().getTipus() + " [" + u.getAuto().getRendszam() + "]");
+                if (u.getAuto() != null && u.getAuto().getRendszam() != null) {
+                    autok.add(u.getAuto().getTipus() + " [" + u.getAuto().getRendszam() + "]");
+                }
             }
+
+            // Lekérjük az "autok" táblából is, hogy az új/üres autókat is tudjuk törölni
+            List<Auto> dbAutok = db.autoDao().getAllAutok();
+            for (Auto a : dbAutok) {
+                if (a.getRendszam() != null) {
+                    autok.add(a.getTipus() + " [" + a.getRendszam() + "]");
+                }
+            }
+
             final List<String> lista = new ArrayList<>(autok);
+
             runOnUiThread(() -> {
-                if (lista.isEmpty()) { Toast.makeText(this, "Nincs autó!", Toast.LENGTH_SHORT).show(); return; }
+                if (lista.isEmpty()) { Toast.makeText(this, "Nincs törölhető autó!", Toast.LENGTH_SHORT).show(); return; }
+
+                String[] autoArray = lista.toArray(new String[0]);
+                boolean[] checkedItems = new boolean[autoArray.length];
+
                 new AlertDialog.Builder(this)
-                        .setTitle("Válaszd ki a törlendő autót")
-                        .setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, lista), (dialog, which) -> {
-                            executeTargetedDelete(lista.get(which), false);
-                        }).show();
+                        .setTitle("Válaszd ki a törlendő autókat")
+                        .setMultiChoiceItems(autoArray, checkedItems, (dialog, which, isChecked) -> {
+                            checkedItems[which] = isChecked;
+                        })
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            List<String> kivalasztottak = new ArrayList<>();
+                            for (int i = 0; i < checkedItems.length; i++) {
+                                if (checkedItems[i]) kivalasztottak.add(autoArray[i]);
+                            }
+
+                            if (!kivalasztottak.isEmpty()) {
+                                executeTargetedMultipleDelete(kivalasztottak, false);
+                            } else {
+                                Toast.makeText(this, "Nem választottál ki semmit!", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton("Mégse", null)
+                        .show();
             });
         });
     }
 
-    private void executeTargetedDelete(String keresettString, boolean isSofor) {
+    // --- TÖBBES TÖRLÉS LOGIKÁJA ---
+    private void executeTargetedMultipleDelete(List<String> keresettStringek, boolean isSofor) {
         showProgress(true);
         databaseExecutor.execute(() -> {
             List<Ut> utak = db.utDao().getAllUtak();
             int szamlalo = 0;
+
+            // 1. Törlés az Utak táblából (sablonok és korábbi fuvarok)
             for (Ut u : utak) {
                 boolean match = false;
-                if (isSofor && u.getSofor() != null && u.getSofor().getNev().equals(keresettString)) match = true;
-                if (!isSofor && u.getAuto() != null && keresettString.contains(u.getAuto().getRendszam())) match = true;
-                if (match) { db.utDao().delete(u); szamlalo++; }
+                for (String keresett : keresettStringek) {
+                    if (isSofor && u.getSofor() != null && u.getSofor().getNev().equals(keresett)) {
+                        match = true; break;
+                    }
+                    if (!isSofor && u.getAuto() != null && keresett.contains(u.getAuto().getRendszam())) {
+                        match = true; break;
+                    }
+                }
+                if (match) {
+                    db.utDao().delete(u);
+                    szamlalo++;
+                }
             }
+
+            // 2. Ha autókat törlünk, akkor a kliens szinkronizációja miatt az autok táblából is KÖTELEZŐ törölni!
+            if (!isSofor) {
+                List<Auto> allAutok = db.autoDao().getAllAutok();
+                for (Auto a : allAutok) {
+                    for (String keresett : keresettStringek) {
+                        if (keresett.contains(a.getRendszam())) {
+                            db.autoDao().deleteByRendszam(a.getRendszam());
+                        }
+                    }
+                }
+            }
+
             final int finalSzamlalo = szamlalo;
             runOnUiThread(() -> {
                 showProgress(false);
-                Toast.makeText(this, "Törölve: " + finalSzamlalo + " bejegyzés.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Sikeres törlés! Érintett bejegyzések: " + finalSzamlalo, Toast.LENGTH_SHORT).show();
             });
         });
     }
@@ -212,7 +288,6 @@ public class AdminActivity extends AppCompatActivity {
             List<Ut> mindenUt = db.utDao().getAllUtak();
             List<Ut> lathatoUtak = new ArrayList<>();
 
-            // Csak a nem-SABLON bejegyzéseket vesszük alapul
             for (Ut u : mindenUt) {
                 if (u != null && !"SABLON".equals(u.getStatus())) {
                     lathatoUtak.add(u);
@@ -236,7 +311,7 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
-    // --- SEGÉDFUNKCIÓK (Jelszó, Teszt, Progress) ---
+    // --- SEGÉDFUNKCIÓK ---
     private void jelszoBekerese() {
         AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setTitle("Admin kulcs");
@@ -249,43 +324,6 @@ public class AdminActivity extends AppCompatActivity {
         });
         b.setNegativeButton("Mégse", (d, w) -> finish());
         b.setCancelable(false); b.show();
-    }
-
-    private void tesztAdatokHozzaadasa() {
-        showProgress(true);
-        databaseExecutor.execute(() -> {
-            String[] n = {"Nagy Janos", "Kiss Maria", "Kovacs Peter"};
-            String[] t = {"Suzuki Swift", "Opel Astra", "Toyota Corolla"};
-            for (int i = 0; i < 100; i++) {
-                String rNap = String.format(Locale.US, "%02d", random.nextInt(28) + 1);
-                String datum = "2026-03-" + rNap;
-
-                // JAVÍTÁS: Itt is bekerült az "ELERHETO" a 3. paraméter helyére!
-                db.utDao().insert(new Ut(new Sofor(n[random.nextInt(n.length)]),
-                        new Auto("ABC-"+(100+i), t[random.nextInt(t.length)], "ELERHETO"),
-                        "Hely A", "Hely B", 10.0 + random.nextInt(50), 5.0, 6.5, datum, "BEERKEZO"));
-            }
-            runOnUiThread(() -> { showProgress(false); Toast.makeText(this, "100 adat kész.", Toast.LENGTH_SHORT).show(); });
-        });
-    }
-
-    private void osszesBejegyzesTorlese() {
-        new AlertDialog.Builder(this).setTitle("MINDEN TÖRLÉSE").setMessage("Biztosan törölsz mindent? A sorszámozás is 1-ről fog indulni!")
-                .setPositiveButton("Igen", (d, w) -> {
-                    showProgress(true);
-                    databaseExecutor.execute(() -> {
-                        db.utDao().deleteAll();
-                        db.utDao().resetSequence();
-
-                        // Opcionális: Ha az autókat is törölni akarod a teljes resetnél, ez a sor megteszi:
-                        // db.autoDao().deleteAll();
-
-                        runOnUiThread(() -> {
-                            showProgress(false);
-                            Toast.makeText(this, "Adatbázis ürítve, sorszámozás resetelve.", Toast.LENGTH_SHORT).show();
-                        });
-                    });
-                }).setNegativeButton("Mégse", null).show();
     }
 
     private void showProgress(boolean show) {
@@ -306,4 +344,44 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     @Override public boolean onSupportNavigateUp() { onBackPressed(); return true; }
+
+    private void tesztAdatokHozzaadasa() {
+        showProgress(true);
+        databaseExecutor.execute(() -> {
+            String[] n = {"Nagy Janos", "Kiss Maria", "Kovacs Peter"};
+            String[] t = {"Suzuki Swift", "Opel Astra", "Toyota Corolla"};
+            for (int i = 0; i < 100; i++) {
+                String rNap = String.format(Locale.US, "%02d", random.nextInt(28) + 1);
+                String datum = "2026-03-" + rNap;
+
+                String rendszam = "ABC-" + (100 + i);
+                String tipus = t[random.nextInt(t.length)];
+
+                Auto ujAuto = new Auto(rendszam, tipus, "ELERHETO");
+                db.autoDao().insert(ujAuto);
+
+                db.utDao().insert(new Ut(new Sofor(n[random.nextInt(n.length)]),
+                        ujAuto,
+                        "Hely A", "Hely B", 10.0 + random.nextInt(50), 5.0, 6.5, datum, "BEERKEZO"));
+            }
+            runOnUiThread(() -> { showProgress(false); Toast.makeText(this, "100 adat kész.", Toast.LENGTH_SHORT).show(); });
+        });
+    }
+
+    private void osszesBejegyzesTorlese() {
+        new AlertDialog.Builder(this).setTitle("MINDEN TÖRLÉSE").setMessage("Biztosan törölsz mindent? A sorszámozás is 1-ről fog indulni!")
+                .setPositiveButton("Igen", (d, w) -> {
+                    showProgress(true);
+                    databaseExecutor.execute(() -> {
+                        db.utDao().deleteAll();
+                        db.utDao().resetSequence();
+                        db.autoDao().deleteAll();
+
+                        runOnUiThread(() -> {
+                            showProgress(false);
+                            Toast.makeText(this, "Minden adat és autó sikeresen törölve!", Toast.LENGTH_SHORT).show();
+                        });
+                    });
+                }).setNegativeButton("Mégse", null).show();
+    }
 }

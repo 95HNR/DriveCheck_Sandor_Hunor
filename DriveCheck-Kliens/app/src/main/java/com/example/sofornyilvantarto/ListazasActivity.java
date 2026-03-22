@@ -34,11 +34,13 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
 public class ListazasActivity extends AppCompatActivity {
 
     private TextInputEditText etFilterDatum, etFilterSofor, etFilterRendszam;
     private RecyclerView recyclerView;
     private com.example.sofornyilvantarto.UtAdapter adapter;
+
     private String serverIp;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final Gson gson = new Gson();

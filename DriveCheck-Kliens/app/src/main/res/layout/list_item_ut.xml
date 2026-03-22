@@ -41,24 +41,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Sofőr: Kovács János | Autó: ABC-123"
-            android:textColor="#555555" />
+            android:text="Sofőr: Kovács János | Autó: Suzuki Swift (ABC-123)" />
 
         <TextView
-            android:id="@+id/tv_item_utvonal"
+            android:id="@+id/tv_item_utvonal_tav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Úticél: Budapest -> Bécs"
-            android:textStyle="italic" />
+            android:text="Úticél: Budapest -> Bécs | Táv: 240 km" />
 
         <TextView
-            android:id="@+id/tv_item_tav_koltseg"
+            android:id="@+id/tv_item_fogyasztas_atlag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Táv: 240 km | Költség: 45 EUR | Fogyasztás: 18L"
-            android:textColor="#333333" />
+            android:text="Fogyasztás: 15.0 L | Átlag: 6.0 L/100km" />
+
+        <TextView
+            android:id="@+id/tv_item_koltseg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Költség: 45 EUR" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
