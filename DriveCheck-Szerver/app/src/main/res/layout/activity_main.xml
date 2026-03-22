@@ -20,8 +20,7 @@
             android:layout_height="180dp"
             android:layout_marginBottom="16dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@android:color/transparent">
+            app:cardElevation="6dp">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -44,12 +43,6 @@
             android:layout_width="360dp"
             android:layout_height="60dp"
             android:text="Kérelmek kezelése"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:textColor="#381E72"
-            app:iconTint="#381E72"
-            app:backgroundTint="#D0BCFF"
-            app:cornerRadius="30dp"
             app:icon="@android:drawable/ic_menu_agenda"
             android:layout_marginBottom="12dp"/>
 
@@ -58,12 +51,6 @@
             android:layout_width="360dp"
             android:layout_height="60dp"
             android:text="Összesítés és szűrés"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:textColor="#381E72"
-            app:iconTint="#381E72"
-            app:backgroundTint="#D0BCFF"
-            app:cornerRadius="30dp"
             app:icon="@android:drawable/ic_menu_search"
             android:layout_marginBottom="12dp"/>
 
@@ -71,13 +58,7 @@
             android:id="@+id/btn_admin"
             android:layout_width="360dp"
             android:layout_height="60dp"
-            android:text="Rendszerbeállítások"
-            android:textAllCaps="false"
-            android:textSize="14sp"
-            android:textColor="#381E72"
-            app:iconTint="#381E72"
-            app:backgroundTint="#D0BCFF"
-            app:cornerRadius="30dp"
+            android:text="Adminisztrációs műveletek"
             app:icon="@android:drawable/ic_menu_manage"
             android:layout_marginBottom="20dp"/>
 
@@ -86,13 +67,9 @@
             android:layout_width="360dp"
             android:layout_height="60dp"
             android:text="OFFLINE"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:textSize="14sp"
+            android:backgroundTint="#C62828"
             android:textColor="@android:color/white"
             app:iconTint="@android:color/white"
-            app:backgroundTint="#B3261E"
-            app:cornerRadius="30dp"
             app:icon="@android:drawable/ic_lock_power_off"
             android:layout_marginBottom="20dp"/>
 
